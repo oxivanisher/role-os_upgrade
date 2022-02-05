@@ -1,0 +1,43 @@
+---
+
+- name: Check if 3D printer is connected
+  uri:
+    url: "http://localhost/api/printer"
+    # url: "http://localhost/api/printer"
+    method: GET
+    body_format: json
+    status_code: [200, 409]
+    # return_content: true
+    headers:
+      # Content-Type: application/json
+      X-Api-Key: "{{ octoprint_api_key }}"
+  register: octoprint_api_connected_return
+  when: "'octoprint_server' in group_names"
+
+- name: Check for running 3d print
+  uri:
+    url: "http://localhost/api/printer?exclude=temperature,sd"
+    # url: "http://localhost/api/printer"
+    method: GET
+    body_format: json
+    status_code: [200, 409]
+    return_content: true
+    headers:
+      # Content-Type: application/json
+      X-Api-Key: "{{ octoprint_api_key }}"
+  register: octoprint_api_status_return
+  when:
+    - "'octoprint_server' in group_names"
+    - octoprint_api_connected_return.json.error|default(False) != "Printer is not operational"
+
+- import_tasks: debian.yml
+  when: 
+    - ansible_distribution|lower == "debian"
+    - octoprint_api_status_return.json.state.flags.printing|default(False) != true
+
+- name: Show message that update is skipped due to 3d printing
+  ansible.builtin.debug:
+    msg: Skipping updated due to running 3D print
+  when:
+    - octoprint_api_status_return.json.state.flags.printing|default(False) == true
+
