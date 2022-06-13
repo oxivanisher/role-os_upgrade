@@ -1,7 +1,7 @@
 ---
 
 - name: Check if 3D printer is connected
-  uri:
+  ansible.builtin.uri:
     url: "http://localhost/api/printer"
     # url: "http://localhost/api/printer"
     method: GET
@@ -15,7 +15,7 @@
   when: "'octoprint_server' in group_names"
 
 - name: Check for running 3d print
-  uri:
+  ansible.builtin.uri:
     url: "http://localhost/api/printer?exclude=temperature,sd"
     # url: "http://localhost/api/printer"
     method: GET
