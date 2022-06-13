@@ -1,0 +1,2 @@
+warn_list:  # or 'skip_list' to silence them completely
+  - literal-compare  # Don't compare to literal True/False.
