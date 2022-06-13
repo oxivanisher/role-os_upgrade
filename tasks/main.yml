@@ -31,7 +31,7 @@
     - octoprint_api_connected_return.json.error|default(False) != "Printer is not operational"
 
 - import_tasks: debian.yml
-  when: 
+  when:
     - ansible_distribution|lower == "debian"
     - octoprint_api_status_return.json.state.flags.printing|default(False) != true
 
@@ -40,4 +40,3 @@
     msg: Skipping updated due to running 3D print
   when:
     - octoprint_api_status_return.json.state.flags.printing|default(False) == true
-
