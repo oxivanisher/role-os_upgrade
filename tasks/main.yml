@@ -30,7 +30,8 @@
     - "'octoprint_server' in group_names"
     - octoprint_api_connected_return.json.error|default(False) != "Printer is not operational"
 
-- import_tasks: debian.yml
+- name: Load debian tasks for reboot check
+  ansible.builtin.import_tasks: debian.yml
   when:
     - ansible_distribution|lower == "debian"
     - octoprint_api_status_return.json.state.flags.printing|default(False) != true
