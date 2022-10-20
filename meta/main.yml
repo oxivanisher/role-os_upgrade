@@ -1,5 +1,6 @@
 galaxy_info:
   role_name: os_upgrade
+  namespace: oxivanisher
   author: Marc Urben
   description: Do OS upgrades
   company: Thunderbluff
