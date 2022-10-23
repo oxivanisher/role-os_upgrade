@@ -33,7 +33,6 @@
 - name: Load debian tasks for reboot check
   ansible.builtin.import_tasks: debian.yml
   when:
-    when:
     - ansible_distribution|lower == "debian" or ansible_distribution|lower == "ubuntu"
     - octoprint_api_status_return.json.state.flags.printing|default(False) != true
 
