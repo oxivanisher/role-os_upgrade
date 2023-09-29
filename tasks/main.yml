@@ -1,5 +1,4 @@
 ---
-
 - name: Check if 3D printer is connected
   ansible.builtin.uri:
     url: "http://localhost/api/printer"
@@ -34,10 +33,10 @@
   ansible.builtin.import_tasks: debian.yml
   when:
     - ansible_distribution|lower == "debian" or ansible_distribution|lower == "ubuntu"
-    - octoprint_api_status_return.json.state.flags.printing|default(False) != true
+    - not octoprint_api_status_return.json.state.flags.printing|default(False)
 
 - name: Show message that update is skipped due to 3d printing
   ansible.builtin.debug:
     msg: Skipping updated due to running 3D print
   when:
-    - octoprint_api_status_return.json.state.flags.printing|default(False) == true
+    - octoprint_api_status_return.json.state.flags.printing|default(False)
