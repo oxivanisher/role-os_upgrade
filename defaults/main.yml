@@ -1,4 +1,2 @@
 ---
-
-# task should fail when no key is defined, so leave this uncommented
-# octoprint_api_key:
+os_upgrade_os_upgrade_octoprint_api_key:

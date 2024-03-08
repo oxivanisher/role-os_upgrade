@@ -9,9 +9,9 @@
     # return_content: true
     headers:
       # Content-Type: application/json
-      X-Api-Key: "{{ octoprint_api_key }}"
-  register: octoprint_api_connected_return
-  when: "'octoprint_server' in group_names"
+      X-Api-Key: "{{ os_upgrade_octoprint_api_key }}"
+  register: os_upgrade_octoprint_api_connected_return
+  when: os_upgrade_octoprint_api_key | length > 0
 
 - name: Check for running 3d print
   ansible.builtin.uri:
@@ -23,20 +23,20 @@
     return_content: true
     headers:
       # Content-Type: application/json
-      X-Api-Key: "{{ octoprint_api_key }}"
-  register: octoprint_api_status_return
+      X-Api-Key: "{{ os_upgrade_octoprint_api_key }}"
+  register: os_upgrade_octoprint_api_status_return
   when:
-    - "'octoprint_server' in group_names"
-    - octoprint_api_connected_return.json.error|default(False) != "Printer is not operational"
+    - os_upgrade_octoprint_api_key | length > 0
+    - os_upgrade_octoprint_api_connected_return.json.error|default(False) != "Printer is not operational"
 
 - name: Load debian tasks for reboot check
   ansible.builtin.import_tasks: debian.yml
   when:
     - ansible_distribution|lower == "debian" or ansible_distribution|lower == "ubuntu"
-    - not octoprint_api_status_return.json.state.flags.printing|default(False)
+    - not os_upgrade_octoprint_api_status_return.json.state.flags.printing|default(False)
 
 - name: Show message that update is skipped due to 3d printing
   ansible.builtin.debug:
     msg: Skipping updated due to running 3D print
   when:
-    - octoprint_api_status_return.json.state.flags.printing|default(False)
+    - os_upgrade_octoprint_api_status_return.json.state.flags.printing|default(False)
