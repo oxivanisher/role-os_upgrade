@@ -2,14 +2,14 @@ os-upgrade
 ==========
 
 Upgrades all OS packages to the latest version.
-If the `os_upgrade_os_upgrade_octoprint_api_key` variable is set, it checks for running 3d prints and excludes the system from updates if it is printing.
+If the `os_upgrade_octoprint_api_key` variable is set, it checks for running 3d prints and excludes the system from updates if it is printing.
 
 Role Variables
 --------------
 
-| Name                                    | Comment                                   | Default value |
-|-----------------------------------------|-------------------------------------------|---------------|
-| os_upgrade_os_upgrade_octoprint_api_key | Octoprint API key                         | ``            |
+| Name                         | Comment                                   | Default value |
+|------------------------------|-------------------------------------------|---------------|
+| os_upgrade_octoprint_api_key | Octoprint API key                         | ``            |
 
 
 Dependencies
