@@ -11,7 +11,7 @@
       # Content-Type: application/json
       X-Api-Key: "{{ os_upgrade_octoprint_api_key }}"
   register: os_upgrade_octoprint_api_connected_return
-  when: os_upgrade_octoprint_api_key | length > 0
+  when: os_upgrade_octoprint_api_key | default('', true) | length > 0
 
 - name: Check for running 3d print
   ansible.builtin.uri:
@@ -26,7 +26,7 @@
       X-Api-Key: "{{ os_upgrade_octoprint_api_key }}"
   register: os_upgrade_octoprint_api_status_return
   when:
-    - os_upgrade_octoprint_api_key | length > 0
+    - os_upgrade_octoprint_api_key | default('', true) | length > 0
     - os_upgrade_octoprint_api_connected_return.json.error|default(False) != "Printer is not operational"
 
 - name: Load debian tasks for reboot check
