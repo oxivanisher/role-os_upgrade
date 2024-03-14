@@ -7,11 +7,15 @@
     update_cache: true
     force_apt_get: true
     cache_valid_time: 3600
+  become: true
+  become_user: root
 
 - name: Upgrade all apt packages
   ansible.builtin.apt:
     upgrade: dist
     force_apt_get: true
+  become: true
+  become_user: root
 
 - name: Check if a reboot is needed for Debian and Ubuntu boxes
   ansible.builtin.stat:
