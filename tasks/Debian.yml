@@ -16,9 +16,3 @@
     force_apt_get: true
   become: true
   become_user: root
-
-- name: Check if a reboot is needed for Debian and Ubuntu boxes
-  ansible.builtin.stat:
-    path: /var/run/reboot-required
-    get_md5: false
-  register: reboot_required_file
