@@ -32,7 +32,7 @@
 - name: Load Debian specific tasks tasks for reboot check
   ansible.builtin.import_tasks: "Debian.yml"
   when:
-    - ansible_os_family == "Debian"
+    - ansible_facts.os_family == "Debian"
     - not os_upgrade_octoprint_api_status_return.json.state.flags.printing|default(False)
 
 - name: Show message that update is skipped due to 3d printing
