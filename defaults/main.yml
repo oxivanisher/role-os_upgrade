@@ -15,3 +15,7 @@ os_upgrade_reboot_if_required: false
 
 # OctoPrint API key for 3D print detection
 os_upgrade_octoprint_api_key:
+
+# Pushover notification
+os_upgrade_pushover_userkey:
+os_upgrade_pushover_appkey:

@@ -49,6 +49,23 @@
     msg: The system would like to be rebooted due to package upgrades and/or running services
   when: reboot_required
 
+- name: Send notification to pushover
+  ansible.builtin.uri:
+    url: https://api.pushover.net/1/messages.json
+    method: POST
+    body_format: form-urlencoded
+    status_code: 200
+    body:
+      user: "{{ os_upgrade_pushover_userkey }}"
+      token: "{{ os_upgrade_pushover_appkey }}"
+      message: "{{ ansible_facts.hostname }} will be rebooted!"
+  no_log: false
+  failed_when: false
+  when:
+    - reboot_required
+    - os_upgrade_pushover_userkey | default('', true) | length > 0
+    - os_upgrade_pushover_appkey | default('', true) | length > 0
+
 - name: Reboot system after package upgrade
   ansible.builtin.reboot:
     msg: "Reboot initiated by Ansible for package upgrade"
