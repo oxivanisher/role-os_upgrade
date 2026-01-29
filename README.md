@@ -8,9 +8,17 @@ If the `os_upgrade_octoprint_api_key` variable is set, it checks for running 3d 
 Role Variables
 --------------
 
-| Name                         | Comment                                   | Default value |
-|------------------------------|-------------------------------------------|---------------|
-| os_upgrade_octoprint_api_key | Octoprint API key                         | ``            |
+| Name                           | Comment                                                                                                                                                            | Default value |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
+| os_upgrade_clean_package_files | Should all downloaded package file be removed?                                                                                                                     | `true`        |
+| os_upgrade_debian_mode         | Select the [package upgrade mode](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html)                                             | `dist`        |
+| os_upgrade_do_reboot           | Should the systems always be rebooted?                                                                                                                             | `false`       |
+| os_upgrade_octoprint_api_key   | Octoprint API key                                                                                                                                                  | ``            |
+| os_upgrade_reboot_if_required  | Only reboot the system if it is required.                                                                                                                          | `false`       |
+| os_upgrade_suse_force_accept   | This forces zypper to accept new repo keys, replace files during upgrades and allows vendor changes.                                                               | `true`        |
+| os_upgrade_suse_mode           | Select the target [package state](https://docs.ansible.com/ansible/latest/collections/community/general/zypper_module.html). Should be `latest` or `dist-upgrade`. | `latest`      |
+
+**A note to reboot:** This variable controls if the system(s) will be rebooted. Default is no reboot, change `os_upgrade_do_reboot` to `true` to force reboots.
 
 
 Dependencies

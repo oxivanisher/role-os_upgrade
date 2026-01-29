@@ -1,0 +1,39 @@
+---
+- name: Refresh Suse repositories and accept new keys
+  community.general.zypper_repository:
+    repo: '*'
+    runrefresh: true
+    auto_import_keys: "{{ os_upgrade_suse_force_accept }}"
+  become: true
+  become_user: root
+
+- name: Update packages on Suse systems
+  community.general.zypper:
+    name: '*'
+    state: "{{ os_upgrade_suse_mode }}"
+    clean_deps: true
+    allow_vendor_change: "{{ os_upgrade_suse_force_accept }}"
+    replacefiles: "{{ os_upgrade_suse_force_accept }}"
+  become: true
+  become_user: root
+
+- name: Check for cached package files in zypp cache
+  ansible.builtin.find:
+    paths: /var/cache/zypp/packages
+    file_type: file
+    recurse: true
+  register: zypp_cache_files
+  become: true
+  become_user: root
+
+- name: Remove cached package files on Suse systems
+  ansible.builtin.command:
+    argv:
+      - zypper
+      - clean
+  become: true
+  become_user: root
+  changed_when: true
+  when:
+    - os_upgrade_clean_package_files
+    - zypp_cache_files.matched | int > 0

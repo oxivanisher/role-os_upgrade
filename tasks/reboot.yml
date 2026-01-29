@@ -1,0 +1,62 @@
+---
+
+- name: Check reboot for Suse and Red Hat systems
+  when: ansible_os_family in ['Suse', 'RedHat']
+  block:
+    - name: Check if needs-restarting would like to reboot the Suse or Red Hat system
+      ansible.builtin.command:
+        argv:
+          - needs-restarting
+          - -r
+      register: needs_rebooting_r
+      changed_when: false
+      failed_when: needs_rebooting_r.rc not in [0, 1]
+      become: true
+      become_user: root
+
+    - name: Check if needs-restarting would like to reboot the Suse and Red Hat system for running processes
+      ansible.builtin.command:
+        argv:
+          - needs-restarting
+          - -s
+      register: needs_rebooting_s
+      changed_when: false
+      failed_when: needs_rebooting_s.rc not in [0, 102]
+      become: true
+      become_user: root
+
+    - name: Determine if the Suse and Red Hat system requires a reboot
+      ansible.builtin.set_fact:
+        reboot_required: "{{ (needs_rebooting_r.rc == 1) or (needs_rebooting_s.rc == 102) }}"
+
+- name: Check reboot for Debian systems
+  when: ansible_os_family == "Debian"
+  block:
+    - name: Check if /var/run/reboot-required exists on a Debian system
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: debian_reboot_required
+      changed_when: false
+      become: true
+      become_user: root
+
+    - name: Determine if the Debian system requires a reboot
+      ansible.builtin.set_fact:
+        reboot_required: "{{ debian_reboot_required.stat.exists }}"
+
+- name: Show message if the system would like to be rebooted
+  ansible.builtin.debug:
+    msg: The system would like to be rebooted due to package upgrades and/or running services
+  when: reboot_required
+
+- name: Reboot system after package upgrade
+  ansible.builtin.reboot:
+    msg: "Reboot initiated by Ansible for package upgrade"
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 60
+    test_command: uptime
+  when: os_upgrade_do_reboot or (reboot_required | default(false, true) and os_upgrade_reboot_if_required)
+  become: true
+  become_user: root

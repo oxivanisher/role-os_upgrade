@@ -1,14 +1,12 @@
 ---
+
 - name: Check if 3D printer is connected
   ansible.builtin.uri:
     url: "http://localhost/api/printer"
-    # url: "http://localhost/api/printer"
     method: GET
     body_format: json
     status_code: [200, 409]
-    # return_content: true
     headers:
-      # Content-Type: application/json
       X-Api-Key: "{{ os_upgrade_octoprint_api_key }}"
   register: os_upgrade_octoprint_api_connected_return
   when: os_upgrade_octoprint_api_key | default('', true) | length > 0
@@ -16,27 +14,37 @@
 - name: Check for running 3d print
   ansible.builtin.uri:
     url: "http://localhost/api/printer?exclude=temperature,sd"
-    # url: "http://localhost/api/printer"
     method: GET
     body_format: json
     status_code: [200, 409]
     return_content: true
     headers:
-      # Content-Type: application/json
       X-Api-Key: "{{ os_upgrade_octoprint_api_key }}"
   register: os_upgrade_octoprint_api_status_return
   when:
     - os_upgrade_octoprint_api_key | default('', true) | length > 0
-    - os_upgrade_octoprint_api_connected_return.json.error|default(False) != "Printer is not operational"
-
-- name: Load Debian specific tasks tasks for reboot check
-  ansible.builtin.import_tasks: "Debian.yml"
-  when:
-    - ansible_facts.os_family == "Debian"
-    - not os_upgrade_octoprint_api_status_return.json.state.flags.printing|default(False)
+    - os_upgrade_octoprint_api_connected_return.json.error | default(False) != "Printer is not operational"
 
 - name: Show message that update is skipped due to 3d printing
   ansible.builtin.debug:
-    msg: Skipping updated due to running 3D print
+    msg: Skipping updates due to running 3D print
   when:
-    - os_upgrade_octoprint_api_status_return.json.state.flags.printing|default(False)
+    - os_upgrade_octoprint_api_status_return.json.state.flags.printing | default(False)
+
+- name: Upgrading system since no 3d prints are running
+  when: not os_upgrade_octoprint_api_status_return.json.state.flags.printing | default(False)
+  block:
+    - name: Load Debian specific tasks for reboot check
+      ansible.builtin.import_tasks: "Debian.yml"
+      when: ansible_os_family == "Debian"
+
+    - name: Load Red Hat specific tasks for reboot check
+      ansible.builtin.import_tasks: "RedHat.yml"
+      when: ansible_os_family == "RedHat"
+
+    - name: Load Suse specific tasks for reboot check
+      ansible.builtin.import_tasks: "Suse.yml"
+      when: ansible_os_family == "Suse"
+
+    - name: Check if a reboot is required
+      ansible.builtin.import_tasks: "reboot.yml"

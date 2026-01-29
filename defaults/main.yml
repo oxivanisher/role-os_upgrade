@@ -1,2 +1,17 @@
 ---
+# Package management settings
+os_upgrade_clean_package_files: true
+
+# Debian specific settings
+os_upgrade_debian_mode: dist
+
+# Suse specific settings
+os_upgrade_suse_mode: latest
+os_upgrade_suse_force_accept: true
+
+# Reboot settings
+os_upgrade_do_reboot: false
+os_upgrade_reboot_if_required: false
+
+# OctoPrint API key for 3D print detection
 os_upgrade_octoprint_api_key:
