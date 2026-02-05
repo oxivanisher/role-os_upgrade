@@ -14,15 +14,7 @@
     clean_deps: true
     allow_vendor_change: "{{ os_upgrade_suse_force_accept }}"
     replacefiles: "{{ os_upgrade_suse_force_accept }}"
-  become: true
-  become_user: root
-
-- name: Check for cached package files in zypp cache
-  ansible.builtin.find:
-    paths: /var/cache/zypp/packages
-    file_type: file
-    recurse: true
-  register: zypp_cache_files
+  register: os_upgrade_package_upgrade
   become: true
   become_user: root
 
@@ -36,4 +28,37 @@
   changed_when: true
   when:
     - os_upgrade_clean_package_files
-    - zypp_cache_files.matched | int > 0
+    - os_upgrade_package_upgrade.changed
+
+- name: Ensure zypper-needs-restarting is installed for Suse
+  community.general.zypper:
+    name: zypper-needs-restarting
+    state: present
+  become: true
+  become_user: root
+
+- name: Check if needs-restarting would like to reboot the Suse system
+  ansible.builtin.command:
+    argv:
+      - needs-restarting
+      - -r
+  register: needs_rebooting_r
+  changed_when: false
+  failed_when: needs_rebooting_r.rc not in [0, 1]
+  become: true
+  become_user: root
+
+- name: Check if needs-restarting would like to reboot the Suse system for running processes
+  ansible.builtin.command:
+    argv:
+      - needs-restarting
+      - -s
+  register: needs_rebooting_s
+  changed_when: false
+  failed_when: needs_rebooting_s.rc not in [0, 102]
+  become: true
+  become_user: root
+
+- name: Determine if the Suse system requires a reboot
+  ansible.builtin.set_fact:
+    reboot_required: "{{ (needs_rebooting_r.rc == 1) or (needs_rebooting_s.rc == 102) }}"

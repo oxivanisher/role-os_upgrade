@@ -14,6 +14,7 @@
   ansible.builtin.apt:
     upgrade: "{{ os_upgrade_debian_mode }}"
     force_apt_get: true
+  register: os_upgrade_package_upgrade
   become: true
   become_user: root
 
@@ -28,4 +29,18 @@
     clean: true
   become: true
   become_user: root
-  when: os_upgrade_clean_package_files
+  when:
+    - os_upgrade_clean_package_files
+    - os_upgrade_package_upgrade.changed
+
+- name: Check if /var/run/reboot-required exists on a Debian system
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: debian_reboot_required
+  changed_when: false
+  become: true
+  become_user: root
+
+- name: Determine if the Debian system requires a reboot
+  ansible.builtin.set_fact:
+    reboot_required: "{{ debian_reboot_required.stat.exists }}"

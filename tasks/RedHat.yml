@@ -4,6 +4,7 @@
     name: '*'
     state: latest
     update_cache: true
+  register: os_upgrade_package_upgrade
   become: true
   become_user: root
 
@@ -22,4 +23,34 @@
   become: true
   become_user: root
   changed_when: true
-  when: os_upgrade_clean_package_files
+  when:
+    - os_upgrade_clean_package_files
+    - os_upgrade_package_upgrade.changed
+
+- name: Check if needs-restarting would like to reboot the Red Hat system
+  ansible.builtin.command:
+    argv:
+      - dnf
+      - needs-restarting
+      - -r
+  register: needs_rebooting_r
+  changed_when: false
+  failed_when: needs_rebooting_r.rc not in [0, 1]
+  become: true
+  become_user: root
+
+- name: Check if needs-restarting would like to reboot the Red Hat system for running processes
+  ansible.builtin.command:
+    argv:
+      - dnf
+      - needs-restarting
+      - -s
+  register: needs_rebooting_s
+  changed_when: false
+  failed_when: needs_rebooting_s.rc not in [0, 102]
+  become: true
+  become_user: root
+
+- name: Determine if the Red Hat system requires a reboot
+  ansible.builtin.set_fact:
+    reboot_required: "{{ (needs_rebooting_r.rc == 1) or (needs_rebooting_s.rc == 102) }}"

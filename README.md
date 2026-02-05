@@ -18,7 +18,7 @@ Role Variables
 
 | Name                           | Comment                                                                                                                                                            | Default value |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
-| os_upgrade_clean_package_files | Should all downloaded package file be removed?                                                                                                                     | `true`        |
+| os_upgrade_clean_package_files | Should all downloaded package file be removed after upgrades where installed?                                                                                      | `true`        |
 | os_upgrade_debian_mode         | Select the [package upgrade mode](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html)                                             | `dist`        |
 | os_upgrade_do_reboot           | Should the systems always be rebooted?                                                                                                                             | `false`       |
 | os_upgrade_octoprint_api_key   | Octoprint API key                                                                                                                                                  | ``            |
