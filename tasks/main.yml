@@ -1,5 +1,4 @@
 ---
-
 - name: Check if 3D printer is connected
   ansible.builtin.uri:
     url: "http://localhost/api/printer"
@@ -36,15 +35,15 @@
   block:
     - name: Load Debian specific tasks for reboot check
       ansible.builtin.import_tasks: "Debian.yml"
-      when: ansible_os_family == "Debian"
+      when: ansible_facts.os_family == "Debian"
 
     - name: Load Red Hat specific tasks for reboot check
       ansible.builtin.import_tasks: "RedHat.yml"
-      when: ansible_os_family == "RedHat"
+      when: ansible_facts.os_family == "RedHat"
 
     - name: Load Suse specific tasks for reboot check
       ansible.builtin.import_tasks: "Suse.yml"
-      when: ansible_os_family == "Suse"
+      when: ansible_facts.os_family == "Suse"
 
     - name: Check if a reboot is required
       ansible.builtin.import_tasks: "reboot.yml"
