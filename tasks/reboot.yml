@@ -1,5 +1,4 @@
 ---
-
 - name: Show message if the system would like to be rebooted
   ansible.builtin.debug:
     msg: The system would like to be rebooted due to package upgrades and/or running services
@@ -32,4 +31,3 @@
     test_command: uptime
   when: os_upgrade_do_reboot or (reboot_required | default(false, true) and os_upgrade_reboot_if_required)
   become: true
-  become_user: root

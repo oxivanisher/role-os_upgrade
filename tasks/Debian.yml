@@ -1,5 +1,4 @@
 ---
-
 # based on https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/
 
 - name: Update repos and cache on Debian based systems
@@ -8,7 +7,6 @@
     force_apt_get: true
     cache_valid_time: 3600
   become: true
-  become_user: root
 
 - name: Update packages on Debian based systems
   ansible.builtin.apt:
@@ -16,19 +14,16 @@
     force_apt_get: true
   register: os_upgrade_package_upgrade
   become: true
-  become_user: root
 
 - name: Autoremove no longer required packages installed as dependencies on Debian based systems
   ansible.builtin.apt:
     autoremove: true
   become: true
-  become_user: root
 
 - name: Remove cached package files on Debian based systems
   ansible.builtin.apt:
     clean: true
   become: true
-  become_user: root
   when:
     - os_upgrade_clean_package_files
     - os_upgrade_package_upgrade.changed
@@ -39,7 +34,6 @@
   register: debian_reboot_required
   changed_when: false
   become: true
-  become_user: root
 
 - name: Determine if the Debian system requires a reboot
   ansible.builtin.set_fact:
